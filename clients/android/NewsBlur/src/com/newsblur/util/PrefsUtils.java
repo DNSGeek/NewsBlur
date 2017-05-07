@@ -21,6 +21,7 @@ import android.graphics.BitmapFactory;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.os.Build;
+import android.support.v4.content.FileProvider;
 import android.util.Log;
 
 import com.newsblur.R;
@@ -98,7 +99,7 @@ public class PrefsUtils {
         File f = com.newsblur.util.Log.getLogfile();
         if (f == null) return;
         String debugInfo = "Tell us a bit a about your problem:\n\n\n\n" + getDebugInfo(context);
-        android.net.Uri localPath = android.net.Uri.fromFile(f);
+        android.net.Uri localPath = FileProvider.getUriForFile(context, "com.newsblur.fileprovider", f);
         Intent i = new Intent(Intent.ACTION_SEND);
         i.setType("*/*");
         i.putExtra(Intent.EXTRA_EMAIL, new String[]{"android@newsblur.com"});
@@ -692,7 +693,18 @@ public class PrefsUtils {
     }
 
     public static Font getFont(Context context) {
+        return Font.getFont(getFontString(context));
+    }
+
+    public static String getFontString(Context context) {
         SharedPreferences prefs = context.getSharedPreferences(PrefConstants.PREFERENCES, 0);
-        return Font.getFont(prefs.getString(PrefConstants.READING_FONT, Font.DEFAULT.toString()));
+        return prefs.getString(PrefConstants.READING_FONT, Font.DEFAULT.toString());
+    }
+
+    public static void setFontString(Context context, String newValue) {
+        SharedPreferences prefs = context.getSharedPreferences(PrefConstants.PREFERENCES, 0);
+        Editor editor = prefs.edit();
+        editor.putString(PrefConstants.READING_FONT, newValue);
+        editor.commit();
     }
 }
